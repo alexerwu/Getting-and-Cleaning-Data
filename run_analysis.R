@@ -9,6 +9,13 @@
 # load dplyr library
 library(dplyr)
 
+# set working directory to /Users/alexerwu/Documents/courses/data_science/data/UCI HAR Dataset
+setwd("/Users/alexerwu/Documents/courses/data_science/data/UCI HAR Dataset")
+
+# read UCI HAR Dataset txt files as table objects
+activity_label <- read.table("activity_labels.txt")
+features <- read.table("features.txt")
+
 # set working directory to /Users/alexerwu/Documents/courses/data_science/data/UCI HAR Dataset/test/Inertial Signals
 setwd("/Users/alexerwu/Documents/courses/data_science/data/UCI HAR Dataset/test/Inertial Signals")
 
@@ -62,6 +69,15 @@ X_train <- read.table("X_train.txt")
 
 y_train <- read.table("y_train.txt")
 
+#### Inventory tables ####
+# subject_train: Each row identifies the subject who performed the activity for each window sample. Its range is from 1 to 30.
+# X_train: Training set.
+# y_train: Training labels.
+
+# subject_test: Each row identifies the subject who performed the activity for each window sample. Its range is from 1 to 30.
+# X_test: Test set.
+# y_test: Test labels.
+
 # merge text and train tables as "...merged" table
 body_acc_x_merged <- merge(body_acc_x_train, body_acc_x_test)
 body_acc_y_merged <- merge(body_acc_y_train, body_acc_y_test)
@@ -77,8 +93,35 @@ total_acc_z_merged <- merge(total_acc_z_train, total_acc_z_test)
 
 subject_merged <- merge(subject_train, subject_test)
 
-X_merged <- merge(X_train, X_test)
+training_merged <- merge(X_train, y_train, all=TRUE)
 
-y_merged <- merge(y_train, y_test)
+#### merge activity labels with training set & labels ####
 
+# rename activity label variables to activity_index = V1 and activity_desc = V2
+activity_label_renamed <- rename(activity_label, activity_index = V1, activity_desc = V2)
 
+# rename y_train activity_index = V1
+y_train_renamed <- rename(y_train, activity_index = V1)
+
+# rename subject_train V1 to subject_id and assign to subject_train_renamed
+subject_train_renamed <- rename(subject_train, subject_id = V1)
+
+# cbind y_train_renamed label to X_train data
+train_cbind <- cbind(y_train_renamed, X_train)
+
+#cbind train_cbind with subject_train_renamed to provide subject_id to train set and assign as train_complete
+train_complete <- cbind(subject_train_renamed, train_cbind)
+
+# merge train_complete to activity_label_renamed
+train_merged <- merge(activity_label_renamed, train_complete)
+
+#### merge activity labels with test set & labels ####
+
+# rename y_train activity_index = V1
+y_test_renamed <- rename(y_test, activity_index = V1)
+
+# cbind y_train_renamed label to X_train data
+test_cbind <- cbind(y_test_renamed, X_test)
+
+# merge train_cbind to activity_label_renamed
+test_merged <- merge(activity_label_renamed, test_cbind)
