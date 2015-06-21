@@ -115,13 +115,5 @@ train_complete <- cbind(subject_train_renamed, train_cbind)
 # merge train_complete to activity_label_renamed
 train_merged <- merge(activity_label_renamed, train_complete)
 
-#### merge activity labels with test set & labels ####
-
-# rename y_train activity_index = V1
-y_test_renamed <- rename(y_test, activity_index = V1)
-
-# cbind y_train_renamed label to X_train data
-test_cbind <- cbind(y_test_renamed, X_test)
-
-# merge train_cbind to activity_label_renamed
-test_merged <- merge(activity_label_renamed, test_cbind)
+# write train_merged data set
+write.table("train_merged", file="train_merged.txt", row.name=FALSE)
